@@ -1,10 +1,10 @@
 ;;; perl-quote.el --- helpers for Perl quoted strings
 
-;; Copyright 2008, 2009 Kevin Ryde
+;; Copyright 2008, 2009, 2015 Kevin Ryde
 
-;; Author: Kevin Ryde <user42@zip.com.au>
-;; Version: 4
-;; Keywords: languages
+;; Author: Kevin Ryde <user42_kevin@yahoo.com.au>
+;; Version: 5
+;; Keywords: languages, perl
 ;; URL: http://user42.tuxfamily.org/perl-quote/index.html
 ;; EmacsWiki: PerlLanguage
 
@@ -34,7 +34,7 @@
 ;; `perl-quote-keybindings' below can install.  See the docstrings for more.
 ;;
 ;; Both commands use `forward-sexp' to find the end of string, so if you're
-;; not in perl-mode or cperl-mode then the mode will have to understand perl
+;; not in perl-mode or cperl-mode then the mode will have to understand Perl
 ;; strings enough for `forward-sexp' to be right.  There's no real checking
 ;; of that, but for interactive use you can easily undo if it comes out
 ;; badly wrong.
@@ -49,7 +49,7 @@
 ;;     (add-hook 'cperl-mode-hook 'perl-quote-keybindings)
 ;;
 ;; Or whichever perl-like modes you use, including maybe `pod-mode-hook' for
-;; perl code samples in POD files.
+;; Perl code samples in POD files.
 ;;
 ;; There's autoload cookies for the functions and likely hook customize
 ;; options, if you know how to use `update-file-autoloads' and friends.
@@ -60,6 +60,7 @@
 ;; Version 2 - don't move point
 ;; Version 3 - new home page
 ;; Version 4 - allow double backslash \\
+;; Version 5 - new email
 
 
 ;;; Code:
@@ -68,8 +69,8 @@
   "An internal part of perl-quote.el to crunch backslashing.
 Currently this is as follows:
 PLAINS is a regexp char class string like \"[abc]\".
-FUNC is called (FUNC str) for each occurrance of a PLAINS char or
-of any backslash \"\\X\", except for double backslash \"\\\\\".
+FUNC is called (FUNC str) for each occurrence of a PLAINS char or
+of any backslash \"\\=\\X\", except for double backslash \"\\=\\\\=\\\".
 Point is just after STR in the buffer."
   (goto-char (point-min))
   (let ((re (concat plains "\\|\\(\\\\+\\)")))
@@ -88,8 +89,8 @@ Point is just after STR in the buffer."
 (defun perl-quote-single-backslashing (single-func)
   "An internal part of perl-quote.el to crunch backslashing.
 SINGLE-FUNC is called (SINGLE-FUNC str rep) for STR each
-occurrance of a $, @ or ' or a backslash \"\\X\" except for
-double backslash \"\\\\\".  Point is just after STR in the
+occurrence of a $, @ or ' or a backslash \"\\=\\X\" except for
+double backslash \"\\=\\\\=\\\".  Point is just after STR in the
 buffer.
 
 REP is a replacement string for putting STR into a single quote
@@ -135,18 +136,18 @@ Parens are added for __ and N__ because __'' doesn't work, a
 quote there is the old-style package name separator, it must be
 __('').
 
-Single-quotes in the string are escaped as \\' for the new string
+Single-quotes in the string are escaped as \\=\\' for the new string
 and the following backslash forms in the string are converted to
 literal characters
 
-    \\\"   double-quote (no longer needs backslashing)
-    \\t   tab
-    \\n   newline
-    \\r   carriage-return
-    \\f   form-feed
-    \\b   backspace
-    \\a   bell (alert)
-    \\e   escape (0x1B)
+    \\=\\\"   double-quote (no longer needs backslashing)
+    \\=\\t   tab
+    \\=\\n   newline
+    \\=\\r   carriage-return
+    \\=\\f   form-feed
+    \\=\\b   backspace
+    \\=\\a   bell (alert)
+    \\=\\e   escape (0x1B)
 
 Literal control characters in the source probably aren't a great
 idea, but at least this gives a conversion.  Remember Emacs will
@@ -245,10 +246,10 @@ Point must be at the start of the string, ie. the ' or q.
 Backslashing in the string is amended for the new double-quote
 form,
 
-    \\' -> '   single-quote no longer needs backslashing
-    \"  -> \\\"  double-quote must be backslashed
-    $  -> \\$  dollar backslashed against interpolation
-    @  -> \\@  at backslashed against interpolation
+    \\=\\' -> '   single-quote no longer needs backslashing
+    \"  -> \\=\\\"  double-quote must be backslashed
+    $  -> \\=\\$  dollar backslashed against interpolation
+    @  -> \\=\\@  at backslashed against interpolation
 
 Perl treats other backslashes in a single-quote string as just
 the literal character, and `perl-quote-double' does the same,
@@ -327,6 +328,9 @@ URL `http://user42.tuxfamily.org/perl-quote/index.html'"
 (custom-add-option 'cperl-mode-hook 'perl-quote-keybindings)
 ;;;###autoload
 (custom-add-option 'pod-mode-hook 'perl-quote-keybindings)
+
+;; LocalWords: qq docstrings el backslashing abc str FUNC ie Parens
+;; LocalWords: backslashed TextDomain
 
 (provide 'perl-quote)
 
